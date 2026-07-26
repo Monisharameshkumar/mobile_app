@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Family Savings Account</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Chart.js & Lucide Icons -->
+    <script src="lib/chart.js"></script>
+    <script src="lib/lucide.js"></script>
+</head>
+<body>
+    <div id="app" class="app-container">
+
+        <!-- Top Emerald Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="brand-row">
+                    <i data-lucide="piggy-bank" class="brand-icon"></i>
+                    <span class="brand-title">Family Savings Account</span>
+                </div>
+                <p class="header-month" id="currentMonthLabel">July 2026</p>
+            </div>
+            <button class="notif-header-btn" onclick="openNotifModal()" title="Bill Notifications">
+                <i data-lucide="bell"></i>
+                <span class="notif-dot" id="notifBadgeDot"></span>
+            </button>
+        </header>
+
+        <!-- Main Scrollable Body Area -->
+        <main class="main-body" id="mainContent">
+
+            <!-- TAB 1: DASHBOARD -->
+            <section id="tab-dashboard" class="tab-pane active">
+                <!-- Health Gauge & Financial Balance Card -->
+                <div class="card gauge-card">
+                    <div class="gauge-wrapper">
+                        <svg width="170" height="95" viewBox="0 0 180 100">
+                            <path d="M 20 90 A 70 70 0 0 1 160 90" stroke="#E6ECE5" stroke-width="14" fill="none" stroke-linecap="round" />
+                            <path id="gaugeArcPath" d="M 20 90 A 70 70 0 0 1 148 45" stroke="#16704A" stroke-width="14" fill="none" stroke-linecap="round" />
+                            <text x="90" y="74" text-anchor="middle" font-size="28" font-weight="600" fill="#182420" font-family="'Fraunces', serif" id="gaugeScoreText">88</text>
+                            <text x="90" y="90" text-anchor="middle" font-size="9" fill="#5B6960" font-family="'Inter', sans-serif">financial health</text>
+                        </svg>
+                        <span class="health-label-text" id="healthStatusLabel">Healthy</span>
+                    </div>
+                    <div class="gauge-metrics">
+                        <div class="metric-tile">
+                            <div class="metric-header">
+                                <i data-lucide="wallet" class="icon-indigo"></i>
+                                <span>Family balance</span>
+                            </div>
+                            <div class="metric-value" id="valFamilyBalance">₹52,400</div>
+                        </div>
+                        <div class="metric-tile">
+                            <div class="metric-header">
+                                <i data-lucide="trending-up" class="icon-emerald"></i>
+                                <span>Savings rate</span>
+                            </div>
+                            <div class="metric-value" id="valSavingsRate">59.5%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monthly Income & Expense Tiles -->
+                <div class="metric-row">
+                    <div class="metric-tile">
+                        <div class="metric-header">
+                            <i data-lucide="trending-up" class="icon-emerald"></i>
+                            <span>Monthly income</span>
+                        </div>
+                        <div class="metric-value" id="valMonthlyIncome">₹88,000</div>
+                    </div>
+                    <div class="metric-tile">
+                        <div class="metric-header">
+                            <i data-lucide="trending-down" class="icon-rose"></i>
+                            <span>Monthly expense</span>
+                        </div>
+                        <div class="metric-value" id="valMonthlyExpense">₹35,600</div>
+                    </div>
+                </div>
+
+                <!-- Next Month Upcoming Bill Reminders Quick Card -->
+                <div class="section-label">
+                    <i data-lucide="bell" class="sec-icon"></i>
+                    <span>Upcoming bill reminders</span>
+                </div>
+                <div class="card bill-alert-banner" onclick="switchTab('reminders')">
+                    <div class="banner-left">
+                        <div class="alert-bell-box"><i data-lucide="calendar-clock"></i></div>
+                        <div>
+                            <div class="banner-heading">Next Month Bills (5 Due)</div>
+                            <div class="banner-subtext" id="bannerSubText">Electricity ₹1,800 due Aug 5 • Gas ₹1,200 due Aug 8</div>
+                        </div>
+                    </div>
+                    <i data-lucide="chevron-right" class="arrow-icon"></i>
+                </div>
+
+                <!-- Family Contribution Ledger -->
+                <div class="section-label">
+                    <i data-lucide="users" class="sec-icon"></i>
+                    <span>Family contribution</span>
+                </div>
+                <div class="card">
+                    <div class="ledger-bar" id="ledgerBarContainer">
+                        <!-- Injected JS -->
+                    </div>
+                    <div class="ledger-legend" id="ledgerLegendContainer">
+                        <!-- Injected JS -->
+                    </div>
+                </div>
+
+                <!-- Spending by Category Chart -->
+                <div class="section-label">
+                    <i data-lucide="receipt" class="sec-icon"></i>
+                    <span>Spending by category</span>
+                </div>
+                <div class="card">
+                    <div class="chart-box">
+                        <canvas id="categoryChartCanvas"></canvas>
+                    </div>
+                </div>
+
+                <!-- Income vs Expense Bar Chart -->
+                <div class="section-label">
+                    <i data-lucide="trending-up" class="sec-icon"></i>
+                    <span>Income vs expense</span>
+                </div>
+                <div class="card">
+                    <div class="chart-box bar-box">
+                        <canvas id="incomeVsExpenseCanvas"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: MEMBERS -->
+            <section id="tab-members" class="tab-pane">
+                <div class="section-label">
+                    <i data-lucide="users" class="sec-icon"></i>
+                    <span>Family members</span>
+                </div>
+                
+                <div id="membersListContainer">
+                    <!-- Injected via JS -->
+                </div>
+
+                <div id="addMemberSection">
+                    <button class="btn-primary" onclick="showAddMemberForm()">
+                        <i data-lucide="plus"></i> Add family member
+                    </button>
+                    <div class="card form-card" id="addMemberCard" style="display: none;">
+                        <div class="form-card-header">
+                            <span>New member</span>
+                            <button class="close-icon-btn" onclick="hideAddMemberForm()"><i data-lucide="x"></i></button>
+                        </div>
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" id="mName" placeholder="e.g. Priya">
+                        </div>
+                        <div class="form-group">
+                            <label>Role</label>
+                            <select id="mRole">
+                                <option value="Father">Father</option>
+                                <option value="Mother">Mother</option>
+                                <option value="Son">Son</option>
+                                <option value="Daughter">Daughter</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Monthly income (₹)</label>
+                            <input type="number" id="mIncome" placeholder="e.g. 30000">
+                        </div>
+                        <button class="btn-primary" onclick="handleAddMember()">Save member</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: EXPENSES -->
+            <section id="tab-expenses" class="tab-pane">
+                <div class="section-label">
+                    <i data-lucide="receipt" class="sec-icon"></i>
+                    <span>Expenses this month</span>
+                </div>
+
+                <div id="expensesListContainer">
+                    <!-- Injected via JS -->
+                </div>
+
+                <div id="addExpenseSection">
+                    <button class="btn-primary" onclick="showAddExpenseForm()">
+                        <i data-lucide="plus"></i> Add expense
+                    </button>
+                    <div class="card form-card" id="addExpenseCard" style="display: none;">
+                        <div class="form-card-header">
+                            <span>New expense</span>
+                            <button class="close-icon-btn" onclick="hideAddExpenseForm()"><i data-lucide="x"></i></button>
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="eCategory">
+                                <option value="Groceries">Groceries</option>
+                                <option value="Milk">Milk</option>
+                                <option value="Vegetables">Vegetables</option>
+                                <option value="Medical">Medical</option>
+                                <option value="Petrol">Petrol</option>
+                                <option value="Electricity">Electricity</option>
+                                <option value="Gas">Gas</option>
+                                <option value="Water Bill">Water Bill</option>
+                                <option value="House Rent">House Rent</option>
+                                <option value="Internet">Internet</option>
+                                <option value="Mobile Recharge">Mobile Recharge</option>
+                                <option value="Shopping">Shopping</option>
+                                <option value="Education">Education</option>
+                                <option value="Travel">Travel</option>
+                                <option value="Insurance">Insurance</option>
+                                <option value="Donation">Donation</option>
+                                <option value="EMI">EMI</option>
+                                <option value="Investment">Investment</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Amount (₹)</label>
+                            <input type="number" id="eAmount" placeholder="e.g. 1500">
+                        </div>
+                        <div class="form-group">
+                            <label>Paid by</label>
+                            <select id="ePaidBy">
+                                <!-- Injected JS -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" id="eDate">
+                        </div>
+                        <div class="form-group">
+                            <label>Notes (optional)</label>
+                            <input type="text" id="eNotes" placeholder="e.g. weekly market">
+                        </div>
+                        <button class="btn-primary" onclick="handleAddExpense()">Save expense</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: GOALS -->
+            <section id="tab-goals" class="tab-pane">
+                <div class="section-label">
+                    <i data-lucide="target" class="sec-icon"></i>
+                    <span>Savings goals</span>
+                </div>
+
+                <div id="goalsListContainer">
+                    <!-- Injected via JS -->
+                </div>
+
+                <div id="addGoalSection">
+                    <button class="btn-primary" onclick="showAddGoalForm()">
+                        <i data-lucide="plus"></i> Add goal
+                    </button>
+                    <div class="card form-card" id="addGoalCard" style="display: none;">
+                        <div class="form-card-header">
+                            <span>New goal</span>
+                            <button class="close-icon-btn" onclick="hideAddGoalForm()"><i data-lucide="x"></i></button>
+                        </div>
+                        <div class="form-group">
+                            <label>Goal name</label>
+                            <input type="text" id="gName" placeholder="e.g. New car">
+                        </div>
+                        <div class="form-group">
+                            <label>Target amount (₹)</label>
+                            <input type="number" id="gTarget" placeholder="e.g. 500000">
+                        </div>
+                        <div class="form-group">
+                            <label>Already saved (₹)</label>
+                            <input type="number" id="gSaved" placeholder="e.g. 0">
+                        </div>
+                        <div class="form-group">
+                            <label>Deadline</label>
+                            <input type="date" id="gDeadline">
+                        </div>
+                        <button class="btn-primary" onclick="handleAddGoal()">Save goal</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 5: REMINDERS & NOTIFICATIONS -->
+            <section id="tab-reminders" class="tab-pane">
+                <div class="section-label">
+                    <i data-lucide="bell" class="sec-icon"></i>
+                    <span>Bill Payment Reminders & Notifications</span>
+                </div>
+
+                <div id="remindersListContainer">
+                    <!-- Injected via JS -->
+                </div>
+
+                <div id="addReminderSection">
+                    <button class="btn-primary" onclick="showAddReminderForm()">
+                        <i data-lucide="plus"></i> Add bill reminder
+                    </button>
+                    <div class="card form-card" id="addReminderCard" style="display: none;">
+                        <div class="form-card-header">
+                            <span>New bill reminder</span>
+                            <button class="close-icon-btn" onclick="hideAddReminderForm()"><i data-lucide="x"></i></button>
+                        </div>
+                        <div class="form-group">
+                            <label>Bill Name</label>
+                            <input type="text" id="rTitle" placeholder="e.g. TNEB Electricity Bill">
+                        </div>
+                        <div class="form-group">
+                            <label>Amount (₹)</label>
+                            <input type="number" id="rAmount" placeholder="e.g. 1800">
+                        </div>
+                        <div class="form-group">
+                            <label>Due Date</label>
+                            <input type="date" id="rDueDate">
+                        </div>
+                        <button class="btn-primary" onclick="handleAddReminder()">Save reminder</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Bottom Fixed Navigation Bar -->
+        <nav class="bottom-tab-bar">
+            <button class="tab-nav-btn active" id="btn-tab-dashboard" onclick="switchTab('dashboard')">
+                <i data-lucide="home"></i>
+                <span>Dashboard</span>
+            </button>
+            <button class="tab-nav-btn" id="btn-tab-members" onclick="switchTab('members')">
+                <i data-lucide="users"></i>
+                <span>Members</span>
+            </button>
+            <button class="tab-nav-btn" id="btn-tab-expenses" onclick="switchTab('expenses')">
+                <i data-lucide="receipt"></i>
+                <span>Expenses</span>
+            </button>
+            <button class="tab-nav-btn" id="btn-tab-goals" onclick="switchTab('goals')">
+                <i data-lucide="target"></i>
+                <span>Goals</span>
+            </button>
+            <button class="tab-nav-btn" id="btn-tab-reminders" onclick="switchTab('reminders')">
+                <i data-lucide="bell"></i>
+                <span>Reminders</span>
+            </button>
+        </nav>
+
+        <!-- Notifications Modal Drawer -->
+        <div class="modal-backdrop" id="notifModalBackdrop" onclick="closeNotifModal()">
+            <div class="modal-box" onclick="event.stopPropagation()">
+                <div class="modal-box-header">
+                    <span style="font-weight:600; font-size:15px; color:#0D4A32; font-family:'Fraunces', serif;">🔔 Bill Notifications</span>
+                    <button class="close-icon-btn" onclick="closeNotifModal()"><i data-lucide="x"></i></button>
+                </div>
+                <div class="notif-modal-list" id="notifModalList">
+                    <!-- Injected JS -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Application Engine Script -->
+    <script src="app.js"></script>
+</body>
+</html>
